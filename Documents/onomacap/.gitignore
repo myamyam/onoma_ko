@@ -1,0 +1,12 @@
+# Downloaded Hugging Face model files and local download metadata.
+/models/onoma_ende/
+
+# Downloaded Hugging Face dataset files and local download metadata.
+/data/onoma/
+
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+/outputs/
+/models/kobart-base-v2/
