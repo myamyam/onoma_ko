@@ -1,6 +1,7 @@
 # 한국어 의성어 전사
 
-오디오를 **HTSAT → projection + 위치 정보 → KoBART decoder**로 전달해 한국어 의성어를 생성합니다. 기존 BART 텍스트 encoder는 사용하지 않습니다. HTSAT는 로컬 `HTSAT.ckpt`, decoder는 KoBART 사전학습 가중치로 초기화합니다.
+오디오를 **HTSAT → projection + 위치 정보 → KoBART decoder**로 전달해 한국어 의성어를 생성합니다. 
+HTSAT는 로컬 `HTSAT.ckpt`, decoder는 KoBART 사전학습 가중치로 초기화합니다.
 
 ## 설치와 데이터 준비
 
@@ -44,8 +45,10 @@ python train.py --device cuda
 ```bash
 python train.py --resume outputs/korean_htsat_kobart/last.pt --device cuda
 python evaluate.py --checkpoint outputs/korean_htsat_kobart/best.pt --split test
-python infer.py --checkpoint outputs/korean_htsat_kobart/best.pt path/to/audio.wav
+python inference.py --checkpoint outputs/korean_htsat_kobart/best.pt path/to/audio.wav
 ```
+
+`infer.py`는 기본으로 `outputs/korean_htsat_kobart/best.pt`를 사용합니다. `python infer.py path/to/audio.wav --device cuda`로 실행하며, 여러 오디오 경로를 함께 전달할 수 있습니다. 각 파일의 경로와 생성한 한국어 의성어를 JSON 한 줄씩 출력합니다. 기본 장치 `auto`는 CUDA를 사용할 수 있으면 GPU를 선택합니다.
 
 재개는 epoch 경계에서 `last.pt`의 optimizer/scheduler/scaler와 RNG 상태를 복원합니다. `best.pt`는 검증 CER이 가장 낮은 추론용 가중치입니다. 체크포인트와 같은 폴더의 `tokenizer/`를 함께 보관하세요. 추론은 원본 KoBART/HTSAT 다운로드 경로 없이 체크포인트와 tokenizer만으로 복원합니다. 다른 기계에서 평가할 때 `evaluate.py --config configs/korean.yaml`로 데이터 위치를 지정할 수 있습니다.
 
