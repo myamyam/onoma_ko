@@ -23,8 +23,10 @@ def main():
     model, tokenizer, checkpoint = load_checkpoint(args.checkpoint, device)
     config = checkpoint["config"]
     generation = dict(config["generation"])
+
     if args.num_beams is not None:
         generation["num_beams"] = args.num_beams
+        
     for path in args.audio:
         waveform, length = load_audio(path, config["audio"])
         ids = model.generate(waveform[None].to(device), torch.tensor([length], device=device), **generation)

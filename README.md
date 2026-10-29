@@ -1,6 +1,6 @@
 # 한국어 의성어 전사
 
-오디오를 **HTSAT → projection + 위치 정보 → KoBART decoder**로 전달해 한국어 의성어를 생성합니다. 
+오디오를 **HTSAT → projection + 위치 정보 → KoBART decoder**로 전달해 한국어 의성어를 생성합니다.
 HTSAT는 로컬 `HTSAT.ckpt`, decoder는 KoBART 사전학습 가중치로 초기화합니다.
 
 ## 설치와 데이터 준비
@@ -17,11 +17,9 @@ python prepare_dataset.py
 python audit_dataset.py --hash-audio
 ```
 
-설정은 `configs/korean.yaml`에 있습니다. 설정의 상대 경로는 프로젝트 루트를 기준으로 해석합니다. 명령 예시는 프로젝트 루트에서 실행합니다.
+설정은 `configs/korean.yaml`에 있습니다. 명령 예시는 프로젝트 루트에서 실행합니다.
 
 원본 CSV의 `B1_text`–`B5_text`를 사용합니다. 영어/로마자 레이블과 설명문은 입력하지 않습니다. 같은 오디오의 다섯 정답을 각각 학습하며, 평가에서는 오디오당 한 번 생성해 다섯 정답과 비교합니다.
-
-현재 로컬 데이터 검사에서 원본 7,962개 오디오/39,810개 한국어 정답의 토큰 복원을 확인했습니다. split 사이 동일 파일 68그룹을 발견했고, 중복 행 94개를 제외한 준비 데이터는 train 6,278개, valid 793개, test 797개입니다. 자세한 제거 내역은 `outputs/korean_data/preparation.json`에 있습니다.
 
 `prepare_dataset.py`는 파일 내용의 SHA-256으로 split 사이 동일 파일을 찾아 test > valid > train 순서로 보존하고, 중복되는 다른 split의 행을 제외합니다. 원본 CSV와 오디오는 수정하지 않으며 `outputs/korean_data/`에 준비된 CSV와 `preparation.json`을 기록합니다. 바이트가 다른 재인코딩/부분 녹음은 이 검사로 찾을 수 없어 원본 녹음 메타데이터에 대한 추가 검토가 필요합니다.
 
@@ -54,7 +52,7 @@ python inference.py --checkpoint outputs/korean_htsat_kobart/best.pt path/to/aud
 
 출력에는 `config.json`, `history.jsonl`, epoch별 예측 JSONL, `best.pt`, `last.pt`, `tokenizer/`가 포함됩니다. 현재 실행 환경에서 전체 CUDA 학습 성능은 아직 검증하지 않았습니다.
 
-## 평가 정의
+## eval metrics
 
 - `min_cer`: 공백을 제외한 한글 음절 문자열 기준으로 정답별 CER을 계산하고, 오디오별 최솟값을 구한 뒤 오디오에 대해 macro 평균합니다. 모델 선택 지표입니다.
 - `min_cer_with_spaces`: 공백을 포함해 같은 방식으로 계산합니다.
